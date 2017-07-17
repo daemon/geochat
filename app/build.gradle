@@ -35,6 +35,11 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    compile 'com.google.android.gms:play-services-base:11.0.2'
+    compile 'com.google.android.gms:play-services-basement:11.0.2'
+    compile 'com.google.android.gms:play-services-safetynet:11.0.2'
+    compile 'com.google.android.gms:play-services-tasks:11.0.2'
+    compile 'com.tomergoldst.android:tooltips:1.0.6'
 }
 repositories {
     mavenCentral()

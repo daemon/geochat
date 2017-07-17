@@ -1,4 +1,4 @@
-package com.synaptikos.geochat
+package com.synaptikos.geochat.gui
 
 import android.app.Activity
 import android.view.View
@@ -9,6 +9,5 @@ class KeyboardCloser(val activity: Activity) {
     val manager: InputMethodManager = this.activity.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
     val view: View? = this.activity.currentFocus
     manager.hideSoftInputFromWindow(view?.windowToken, 0)
-    println(view)
   }
 }
