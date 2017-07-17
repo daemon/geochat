@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
   private fun setupKeyboardListener(view: View?) {
     if (view == null || view is EditText)
       return
-    view.setOnTouchListener(fun (_, _: MotionEvent): Boolean {
+    view.setOnTouchListener(fun (_, _): Boolean {
       KeyboardCloser(this).run()
       return false
     })
