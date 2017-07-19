@@ -11,13 +11,17 @@ import android.widget.EditText
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.safetynet.SafetyNet
 import com.synaptikos.geochat.api.ApiClient
+import com.synaptikos.geochat.api.ApiResponse
+import com.synaptikos.geochat.api.ResponseCode
 import com.synaptikos.geochat.api.auth.AuthResponse
 import com.synaptikos.geochat.api.auth.AuthService
 import com.synaptikos.geochat.api.auth.RegisterUserData
 import com.synaptikos.geochat.gui.KeyboardCloser
+import com.synaptikos.geochat.gui.MessageBox
 import com.tomergoldst.tooltips.ToolTip
 import com.tomergoldst.tooltips.ToolTipsManager
 import kotlinx.android.synthetic.main.activity_main.*
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -27,9 +31,11 @@ class MainActivity : AppCompatActivity() {
     REGISTER, LOGIN
   }
   private var state = FormState.LOGIN
+  private var lastLength = 0
   private val ttManager = ToolTipsManager()
-  lateinit var authService: AuthService;
-  lateinit var apiClient: GoogleApiClient
+  private lateinit var authService: AuthService
+  private lateinit var apiClient: GoogleApiClient
+  private var captchaToken: String? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -39,7 +45,26 @@ class MainActivity : AppCompatActivity() {
     this.setupPasswordFont()
     this.setupKeyboardListener(this.authRoot)
     this.setupTabListeners()
+    this.setupInputFields()
     this.setupSubmitListener()
+  }
+
+  private fun setupInputFields() {
+    this.passwordEditText.setOnKeyListener(fun (_, keyCode, _): Boolean {
+      val length = this.passwordEditText.text.length
+      if (length >= 8 && this.lastLength < 8)
+        this.ttManager.findAndDismiss(this.passwordEditText)
+      if (length < 8 && this.lastLength >= 8)
+        this.showPasswordToolTip()
+      this.lastLength = length
+      return false
+    })
+    this.passwordConfirmEditText.setOnKeyListener(fun(_, _, _): Boolean {
+      if (this.passwordConfirmEditText.text.toString() == this.passwordEditText.text.toString() &&
+          this.passwordEditText.length() > 0)
+        this.ttManager.findAndDismiss(this.passwordConfirmEditText)
+      return false
+    })
   }
 
   private fun setupServices() {
@@ -49,23 +74,42 @@ class MainActivity : AppCompatActivity() {
     this.apiClient.connect()
   }
 
+  private fun doSubmit() {
+    if (this.captchaToken == null)
+      return
+    if (this.state == FormState.REGISTER)
+      this.authService.createUser(RegisterUserData(this.emailEditText.text.toString(),
+          this.usernameEditText.text.toString(), this.passwordEditText.text.toString(), this.captchaToken!!)).enqueue(object : Callback<ResponseBody> {
+        override fun onResponse(call: Call<ResponseBody>?, response: Response<ResponseBody>?) {
+          if (response == null)
+            return
+          val rc: AuthResponse = ApiResponse.toResponse(response.body()) ?: return
+          if (rc.isSet(AuthResponse.SUCCESS))
+            return
+          val builder = StringBuilder()
+          for (r in rc.getAllResponseCodes())
+            builder.append(r.toString(this@MainActivity)).append("\n")
+          MessageBox(this@MainActivity, getString(R.string.error), builder.toString()).show()
+        }
+        override fun onFailure(call: Call<ResponseBody>?, t: Throwable?) = showSubmitButton()
+      })
+  }
+
   private fun setupSubmitListener() {
     this.authSubmit.setOnClickListener(fun (_) {
+      this.captchaToken = "fuck you"
+      if (this.captchaToken != null) {
+        this.doSubmit()
+        return
+      }
       val siteKey: String = this.getString(R.string.apiKey)
       SafetyNet.SafetyNetApi.verifyWithRecaptcha(this.apiClient, siteKey).setResultCallback(fun (r) {
         val status = r.status
         if (!status.isSuccess())
           return
         this.hideSubmitButton()
-        val token = r.tokenResult
-        if (this.state == FormState.LOGIN)
-          this.authService.createUser(RegisterUserData(this.emailEditText.text.toString(),
-              this.usernameEditText.text.toString(), this.passwordEditText.text.toString(), token)).enqueue(object : Callback<AuthResponse> {
-            override fun onResponse(call: Call<AuthResponse>?, response: Response<AuthResponse>?) {
-
-            }
-            override fun onFailure(call: Call<AuthResponse>?, t: Throwable?) = showSubmitButton()
-          })
+        this.captchaToken = r.tokenResult
+        this.doSubmit()
       })
     })
   }
@@ -77,22 +121,35 @@ class MainActivity : AppCompatActivity() {
       this.showSubmitButton()
   }
 
-  private fun setupToolTips() {
+  private fun showPasswordToolTip() {
+    if (this.passwordEditText.length() >= 8)
+      return
     val pwReqBuilder = ToolTip.Builder(this, passwordEditText, authFormRoot,
         this.resources.getString(R.string.passwordRequirementTooltip), ToolTip.POSITION_ABOVE)
     pwReqBuilder.setAlign(ToolTip.ALIGN_CENTER)
+    this.ttManager.show(pwReqBuilder.build())
+  }
+
+  private fun showPasswordConfirmToolTip() {
+    if (this.passwordEditText.text.toString() == this.passwordConfirmEditText.text.toString() &&
+        this.passwordEditText.length() > 0)
+      return
     val pwConfirmBuilder = ToolTip.Builder(this, passwordConfirmEditText, authFormRoot,
         this.resources.getString(R.string.passwordConfirmTooltip), ToolTip.POSITION_ABOVE)
     pwConfirmBuilder.setAlign(ToolTip.ALIGN_CENTER)
+    this.ttManager.show(pwConfirmBuilder.build())
+  }
+
+  private fun setupToolTips() {
     this.passwordEditText.setOnFocusChangeListener(fun (view, onFocus) {
       if (onFocus && this.state == FormState.REGISTER)
-        this.ttManager.show(pwReqBuilder.build())
+        this.showPasswordToolTip()
       else
         this.ttManager.findAndDismiss(this.passwordEditText)
     })
     this.passwordConfirmEditText.setOnFocusChangeListener(fun (view, onFocus) {
       if (onFocus && this.state == FormState.REGISTER)
-        this.ttManager.show(pwConfirmBuilder.build())
+        this.showPasswordConfirmToolTip()
       else
         this.ttManager.findAndDismiss(this.passwordConfirmEditText)
     })

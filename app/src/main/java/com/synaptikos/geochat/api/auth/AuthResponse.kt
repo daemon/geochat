@@ -1,24 +1,17 @@
 package com.synaptikos.geochat.api.auth
 
-data class AuthResponse(val code: Int) {
-  private val SUCCESS = 0
-  private val USERNAME_TAKEN = 1
-  private val PASSWORD_INSECURE = 2
-  private val EMAIL_TAKEN = 4
+import com.synaptikos.geochat.R
+import com.synaptikos.geochat.api.ApiResponse
+import com.synaptikos.geochat.api.ResponseCode
+import java.util.*
 
-  fun isSuccess(): Boolean {
-    return this.code == SUCCESS
-  }
+class AuthResponse : ApiResponse {
+  constructor(field: Int) : super(field, SUCCESS, USERNAME_TAKEN, PASSWORD_INSECURE, EMAIL_TAKEN)
 
-  fun isUsernameTaken(): Boolean {
-    return (this.code and USERNAME_TAKEN) != 0
-  }
-
-  fun isPasswordInsecure(): Boolean {
-    return (this.code and PASSWORD_INSECURE) != 0
-  }
-
-  fun isEmailTaken(): Boolean {
-    return (this.code and EMAIL_TAKEN) != 0
+  companion object {
+    val SUCCESS = ResponseCode(0, R.string.authCode1)
+    val USERNAME_TAKEN = ResponseCode(1, R.string.authCode2)
+    val PASSWORD_INSECURE = ResponseCode(2, R.string.authCode3)
+    val EMAIL_TAKEN = ResponseCode(4, R.string.authCode4)
   }
 }

@@ -7,8 +7,13 @@
     <string name="confirmPassword">Confirm password</string>
     <string name="submit">Submit</string>
     <string name="username">Username</string>
-    <string name="passwordRequirementTooltip">Password must be longer than 8 letters.</string>
+    <string name="passwordRequirementTooltip">Password must be at least 8 letters.</string>
     <string name="passwordConfirmTooltip">Passwords must be the same.</string>
-    <string name="apiKey">6LfvgCgUAAAAANmceNVM1KA2Oe0VU6YKn3M4Gkrc</string>
-    <string name="baseUrl">http://ralphtang.com:5555</string>
+    <string name="apiKey">6LfnjykUAAAAAMwpAv8VpKQDfvogMcFwZG3BgZNY</string>
+    <string name="baseUrl">http://ralphtang.com:6666</string>
+    <string name="error">Error</string>
+    <string name="authCode1">Success</string>
+    <string name="authCode2">That username has been taken!</string>
+    <string name="authCode3">Your password is too short; it needs to be at least 8 letters.</string>
+    <string name="authCode4">That email has already been registered!</string>
 </resources>
