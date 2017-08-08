@@ -3,6 +3,9 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#309f69</color>
     <color name="colorAccent">@color/greenleafActive</color>
+    <color name="lightGrey">#efefef</color>
     <color name="greenleafActive">#1aca81</color>
+    <color name="greenleafStrong">#c4d227</color>
+    <color name="greenleafError">#df2e2e</color>
     <color name="greenleafTooltip">#7232d2</color>
 </resources>

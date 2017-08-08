@@ -1,9 +1,8 @@
-package com.synaptikos.geochat.api.auth
+package com.synaptikos.geochat.api.user
 
 import com.synaptikos.geochat.R
 import com.synaptikos.geochat.api.ApiResponse
 import com.synaptikos.geochat.api.ResponseCode
-import java.util.*
 
 class AuthResponse : ApiResponse {
   constructor(field: Int) : super(field, SUCCESS, USERNAME_TAKEN, PASSWORD_INSECURE, EMAIL_TAKEN)

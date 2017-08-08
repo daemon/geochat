@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+                                              android:orientation="vertical"
+                                              android:layout_width="match_parent"
+                                              android:background="@color/lightGrey"
+                                              android:layout_height="match_parent">
+    <View android:layout_height="0dp"
+          android:layout_width="match_parent"
+          android:layout_weight="1">
+
+    </View>
+    <LinearLayout android:orientation="horizontal"
+                  android:layout_width="match_parent"
+                  android:layout_gravity="bottom"
+                  android:background="@color/colorPrimaryDark"
+                  android:minHeight="50dp"
+                  android:layout_height="wrap_content"
+                  android:padding="10dp">
+        <android.support.v7.widget.AppCompatEditText android:background="@drawable/rounded_corners"
+                                                     android:minHeight="30dp"
+                                                     android:maxHeight="53dp"
+                                                     android:layout_height="wrap_content"
+                                                     android:maxLength="320"
+                                                     android:layout_width="0dp"
+                                                     android:paddingLeft="10dp"
+                                                     android:paddingBottom="3dp"
+                                                     android:inputType="textCapSentences|textMultiLine|textShortMessage"
+                                                     android:layout_weight="1">
+        </android.support.v7.widget.AppCompatEditText>
+        <android.support.v7.widget.AppCompatImageButton android:layout_width="wrap_content"
+                                                        android:layout_height="30dp"
+                                                        android:layout_gravity="center_vertical"
+                                                        android:adjustViewBounds="true"
+                                                        android:paddingLeft="7dp"
+                                                        android:background="@null"
+                                                        android:scaleType="fitCenter"
+                                                        android:src="@drawable/send_button_selector">
+        </android.support.v7.widget.AppCompatImageButton>
+    </LinearLayout>
+</android.support.v7.widget.LinearLayoutCompat>

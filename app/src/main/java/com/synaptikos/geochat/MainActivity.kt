@@ -12,10 +12,9 @@ import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.safetynet.SafetyNet
 import com.synaptikos.geochat.api.ApiClient
 import com.synaptikos.geochat.api.ApiResponse
-import com.synaptikos.geochat.api.ResponseCode
-import com.synaptikos.geochat.api.auth.AuthResponse
-import com.synaptikos.geochat.api.auth.AuthService
-import com.synaptikos.geochat.api.auth.RegisterUserData
+import com.synaptikos.geochat.api.user.AuthResponse
+import com.synaptikos.geochat.api.user.UserService
+import com.synaptikos.geochat.api.user.RegisterUserData
 import com.synaptikos.geochat.gui.KeyboardCloser
 import com.synaptikos.geochat.gui.MessageBox
 import com.tomergoldst.tooltips.ToolTip
@@ -33,7 +32,7 @@ class MainActivity : AppCompatActivity() {
   private var state = FormState.LOGIN
   private var lastLength = 0
   private val ttManager = ToolTipsManager()
-  private lateinit var authService: AuthService
+  private lateinit var userService: UserService
   private lateinit var apiClient: GoogleApiClient
   private var captchaToken: String? = null
 
@@ -50,7 +49,7 @@ class MainActivity : AppCompatActivity() {
   }
 
   private fun setupInputFields() {
-    this.passwordEditText.setOnKeyListener(fun (_, keyCode, _): Boolean {
+    this.passwordEditText.setOnKeyListener(fun (_, _, _): Boolean {
       val length = this.passwordEditText.text.length
       if (length >= 8 && this.lastLength < 8)
         this.ttManager.findAndDismiss(this.passwordEditText)
@@ -68,7 +67,7 @@ class MainActivity : AppCompatActivity() {
   }
 
   private fun setupServices() {
-    this.authService = ApiClient.getService(this)
+    this.userService = ApiClient.getService(this)
     this.apiClient = GoogleApiClient.Builder(this).addApi(SafetyNet.API)
         .addOnConnectionFailedListener({ c -> println(c.toString())}).build()
     this.apiClient.connect()
@@ -78,7 +77,7 @@ class MainActivity : AppCompatActivity() {
     if (this.captchaToken == null)
       return
     if (this.state == FormState.REGISTER)
-      this.authService.createUser(RegisterUserData(this.emailEditText.text.toString(),
+      this.userService.createUser(RegisterUserData(this.emailEditText.text.toString(),
           this.usernameEditText.text.toString(), this.passwordEditText.text.toString(), this.captchaToken!!)).enqueue(object : Callback<ResponseBody> {
         override fun onResponse(call: Call<ResponseBody>?, response: Response<ResponseBody>?) {
           if (response == null)
