@@ -7,5 +7,6 @@ class ChatActivity : AppCompatActivity() {
   override fun onCreate(bundle: Bundle?) {
     super.onCreate(bundle)
     this.setContentView(R.layout.activity_chat)
+
   }
 }

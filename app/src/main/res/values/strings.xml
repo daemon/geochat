@@ -16,4 +16,7 @@
     <string name="authCode2">That username has been taken!</string>
     <string name="authCode3">Your password is too short; it needs to be at least 8 letters.</string>
     <string name="authCode4">That email has already been registered!</string>
+    <string name="authCode8">Your CAPTCHA response has expired.</string>
+    <string name="authCode16">You need to login again.</string>
+    <string name="serverUrl">ralphtang.com</string>
 </resources>

@@ -8,4 +8,4 @@ abstract class PacketParser<out T : Packet>(val packetId: Byte) {
   abstract fun parsePacket(buffer: ByteBuffer): T
 }
 
-class InsufficientDataException : Exception() {}
+class InsufficientDataException : Exception()

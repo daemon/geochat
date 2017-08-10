@@ -1,5 +1,6 @@
 package com.synaptikos.geochat.chat.net
 
+import com.synaptikos.geochat.chat.net.handler.PacketHandler
 import com.synaptikos.geochat.chat.net.parser.InsufficientDataException
 import com.synaptikos.geochat.chat.net.parser.PacketDispatcher
 import java.net.InetSocketAddress
@@ -9,7 +10,7 @@ import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.locks.ReentrantLock
 
-class ChatConnection(val host: String, val port: Int = 80) {
+class ChatConnection(val host: String, val port: Int = 8193) {
   private lateinit var channel: SocketChannel
   private var sendThread: Thread
   private var running = true
@@ -25,6 +26,7 @@ class ChatConnection(val host: String, val port: Int = 80) {
   private val dispatcher = PacketDispatcher()
 
   init {
+    this.setupDispatcher()
     Thread {
       var reconnectDelay = 100L
       while (this.running) {
@@ -64,6 +66,19 @@ class ChatConnection(val host: String, val port: Int = 80) {
       }
     }
     this.sendThread.start()
+  }
+
+  fun sendMessage(message: String) {
+    this.sendPacket(C2SChatMessage(message))
+  }
+
+  fun registerHandlers(handler: Any) {
+    this.dispatcher.registerHandlers(handler)
+  }
+
+  private fun setupDispatcher() {
+    this.dispatcher.registerParser(S2CChatMessage.createParser())
+    this.dispatcher.registerHandlers(this)
   }
 
   private fun sendPacket(packet: Packet) {

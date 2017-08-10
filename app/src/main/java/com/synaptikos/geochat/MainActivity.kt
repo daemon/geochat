@@ -1,10 +1,12 @@
 package com.synaptikos.geochat
 
+import android.content.Intent
 import android.graphics.Typeface
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.design.widget.TabLayout
 import android.text.method.PasswordTransformationMethod
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
@@ -35,9 +37,11 @@ class MainActivity : AppCompatActivity() {
   private lateinit var userService: UserService
   private lateinit var apiClient: GoogleApiClient
   private var captchaToken: String? = null
+  private lateinit var preferences: AppPreferences
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    this.preferences = AppPreferences(this)
     setContentView(R.layout.activity_main)
     this.setupServices()
     this.setupToolTips()
@@ -82,9 +86,14 @@ class MainActivity : AppCompatActivity() {
         override fun onResponse(call: Call<ResponseBody>?, response: Response<ResponseBody>?) {
           if (response == null)
             return
-          val rc: AuthResponse = ApiResponse.toResponse(response.body()) ?: return
-          if (rc.isSet(AuthResponse.SUCCESS))
+          val rc: AuthResponse = ApiResponse.toResponse(response.body())
+          if (rc.isSuccess()) {
+            preferences.authToken = rc.authToken()
+            preferences.password = passwordEditText.text.toString()
+            preferences.username = usernameEditText.text.toString()
+            startActivity(Intent(this@MainActivity, ChatActivity::class.java))
             return
+          }
           val builder = StringBuilder()
           for (r in rc.getAllResponseCodes())
             builder.append(r.toString(this@MainActivity)).append("\n")
@@ -96,7 +105,6 @@ class MainActivity : AppCompatActivity() {
 
   private fun setupSubmitListener() {
     this.authSubmit.setOnClickListener(fun (_) {
-      this.captchaToken = "fuck you"
       if (this.captchaToken != null) {
         this.doSubmit()
         return
