@@ -31,6 +31,7 @@ class BufferBuilder {
           }
           is Int -> buffer.putInt(o)
           is Long -> buffer.putLong(o)
+          is ByteArray -> buffer.put(o)
           is Packet.Header -> {
             buffer.put(o.id)
             buffer.putInt(o.length)
